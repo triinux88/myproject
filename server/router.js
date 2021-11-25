@@ -22,27 +22,20 @@ router.get("/get-todo/:id", async function (request, response) {
   response.send(result);
 });
 
-router.patch("/patch-todo/:id", async function (request, response) {
-  let state = await Todos.findOne({ _id: request.params.id });
-  let flipflop = "";
-  if (state.status === "ACTIVE") {
-    flipflop = "DONE";
-  } else {
-    flipflop = "ACTIVE";
-  }
-  const result = await Todos.updateOne(
-    { _id: request.params.id },
-    { $set: { status: flipflop } }
-  );
-  console.log("state Flipped to: ", flipflop);
-  response.send(result);
+router.get("/delete-todo/:id", async function (request, response) {
+ await Todos.deleteOne({ _id: request.params.id });
+  console.log('Delete todo..');
+  response.send({});
 });
 
-router.post("/delete-todo/:id", async function (request, response) {
-  const result = await Todos.deleteOne({ _id: request.params.id });
-  console.log(result);
-  response.send(result);
-});
+router.post("/update-todo/:id", async function (request, response) {
+  // {status : 'COMPLETE'} või {status: 'ACTIVE'}
+  await Todos.updateOne(
+    { _id: request.params.id },
+     {$set:  { status: request.body.status}});
+   console.log('Updating todo..');
+   response.send({});
+ });
 
 router.post("/add-todo", async function (request, response) {
   if (request.body.title) {

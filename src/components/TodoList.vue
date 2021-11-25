@@ -14,20 +14,8 @@
             {{ todo.title }} 
             {{ todo.status }}
 
-            <button
-              @click="completeTodo(todo._id)"
-              type="submit"
-              class="btn btn-primary m-1"
-            >
-              {{ changeState(todo.status) }}
-            </button>
-            <button
-              @click="deleteTodo(todo._id)"
-              type="submit"
-              class="btn btn-primary m-1"
-            >
-              Delete
-            </button>
+            <button @click="deleteTodo(todo._id)"> Delete </button>
+            <button @click="completeTodo(todo._id)"> Done </button>
           </li>
         </ul>
       </div>
@@ -64,6 +52,16 @@ export default {
     const newTodo = ref("");
     const todosFromServer = ref([]);
     const singleTodo = ref({});
+
+    async function deleteTodo(id) {
+      await axios.get("/api/delete-todo/" + id);
+      await getTodos();
+    }
+
+    async function completeTodo(id) {
+      await axios.post("/api/update-todo/" + id, { status: 'COMPLETE' });
+      await getTodos();
+    }
     
     async function getTodos() {
       const result = await axios.get("/api/get-todos");
@@ -76,21 +74,7 @@ export default {
       console.log(result.data);
     }
 
-    async function completeTodo(id) {
-      console.log("FE status update started", id);
-      const result = await axios.patch("/api/patch-todo/" + id);
-      console.log("FE status update sent: ", result.data.status);
-      await getTodos();
-    }
-
-    async function deleteTodo(id) {
-      const result = await axios.post("/api/delete-todo/" + id);
-      singleTodo.value = result.data;
-      console.log("Delete todo: ", result.data);
-      await getTodos();
-    }
-
-    async function addTodo() {
+       async function addTodo() {
       await axios.post("/api/add-todo", {
         title: newTodo.value,
         status: "ACTIVE",
@@ -114,8 +98,8 @@ export default {
       singleTodo,
       getTodo,
       getTodos,
-      completeTodo,
       deleteTodo,
+      completeTodo,
     };
   },
   methods: {
