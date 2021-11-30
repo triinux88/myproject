@@ -11,11 +11,9 @@
             class="list-group-item"
             @click="getTodo(todo._id)"
           >
-            {{ todo.title }} 
-            {{ todo.status }}
-
-            <button @click="deleteTodo(todo._id)"> Delete </button>
-            <button @click="completeTodo(todo._id)"> Done </button>
+            {{ todo.title }} {{ todo.status }}
+            <button @click="deleteTodo(todo._id)">Delete</button>
+            <button @click="completeTodo(todo._id)">Done</button>
           </li>
         </ul>
       </div>
@@ -52,19 +50,20 @@ export default {
     const newTodo = ref("");
     const todosFromServer = ref([]);
     const singleTodo = ref({});
-
     async function deleteTodo(id) {
       await axios.get("/api/delete-todo/" + id);
       await getTodos();
     }
-
     async function completeTodo(id) {
-      await axios.post("/api/update-todo/" + id, { status: 'COMPLETE' });
+      await axios.post("/api/update-todo/" + id, { status: "COMPLETE" });
       await getTodos();
     }
-    
     async function getTodos() {
-      const result = await axios.get("/api/get-todos");
+      const result = await axios.get("/api/get-todos", {
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
+      });
       todosFromServer.value = result.data;
       console.log(result.data);
     }
@@ -73,8 +72,7 @@ export default {
       singleTodo.value = result.data;
       console.log(result.data);
     }
-
-       async function addTodo() {
+    async function addTodo() {
       await axios.post("/api/add-todo", {
         title: newTodo.value,
         status: "ACTIVE",
@@ -82,9 +80,7 @@ export default {
       newTodo.value = "";
       await getTodos();
     }
-
     getTodos();
-
     function addNewTodo() {
       todos.value.push(newTodo.value);
       newTodo.value = "";
@@ -97,25 +93,9 @@ export default {
       addTodo,
       singleTodo,
       getTodo,
-      getTodos,
       deleteTodo,
       completeTodo,
     };
   },
-  methods: {
-    changeState(input) {
-      if (input === "ACTIVE") {
-        return this.todoComplete;
-      } else {
-        return this.todoActivate;
-      }
-    },
-  },
 };
 </script>
-
-<style scoped>
-.completed {
-  background-color: silver;
-}
-</style>

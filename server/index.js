@@ -4,6 +4,10 @@ const port = 4111;
 const routes = require("./router");
 const bodyParser = require("body-parser");
 const db = require("./dbConnection");
+const expressJwt = require("express-jwt");
+const {SECRET} = require('./config')
+
+app.use(expressJwt({secret: SECRET }))
 
 app.use(bodyParser.json());
 
